@@ -1,0 +1,56 @@
+#!/bin/bash
+# VIM Buffers
+
+this=gvim # vim|gvim|nvim etc...
+
+
+echo "Open in:"
+
+existing_server_list=(`$this --serverlist`)
+
+if ((${#existing_server_list[@]} != 0)); then
+	let 'i = 1'
+	for server in ${existing_server_list[@]}; do
+		echo -e "\t[$i] $server"
+		let 'i += 1'
+	done
+fi
+
+echo -e "\t[<name>] New $this instance with <name>"
+echo -e "\t[<enter>] New $this instance with default name"
+
+read user_command
+
+if [ -z $user_command ]; then
+	exec $this "$@"
+fi
+
+if [[ $date =~ [^0-9a-Z_-]+ ]]; then
+	echo "Invalid symbols used"
+	exit -1
+fi
+
+if ((user_command >= 1 && user_command <= ${#existing_server_list[*]})); then
+	let 'index = user_command - 1'
+	server=${existing_server_list[$index]}
+else
+	server="$user_command"
+fi
+
+# Convert to upper case
+server=${server^^}
+
+if [ $# != 0 ]; then
+	exec $this --servername $server --remote-silent "$@"
+else
+	# Get currently active buffer name
+	bufname=`$this --servername $server --remote-expr 'bufname("")'`
+	if [ -z $bufname ]; then
+		# TODO: use more sane solution
+		# Open dummy buffer to capture window focus
+		exec $this --servername $server --remote-silent "[No Name]"
+	else
+		$this --servername $server --remote-silent "$bufname"
+	fi
+
+fi
