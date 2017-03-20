@@ -1,4 +1,4 @@
-# vs - Vim Control
+# vc - Vim Control
 
 Small bash script for creating new and joining existing instances of VIM with custom names.
 
