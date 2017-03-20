@@ -1,5 +1,5 @@
 #!/bin/bash
-# VIM Buffers
+# VIM Control Script
 
 this=gvim # vim|gvim|nvim etc...
 
@@ -44,7 +44,7 @@ if [ $# != 0 ]; then
 	exec $this --servername $server --remote-silent "$@"
 else
 	# Get currently active buffer name
-	bufname=`$this --servername $server --remote-expr 'bufname("")'`
+	bufname=`$this --servername $server --remote-expr 'bufname("")' 2> /dev/null`
 	if [ -z $bufname ]; then
 		# TODO: use more sane solution
 		# Open dummy buffer to capture window focus
