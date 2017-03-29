@@ -24,7 +24,7 @@ if [ -z "$user_command" ]; then
 	exec $VIM "$@"
 fi
 
-if [[ $user_command =~ [0-9a-Z_-]+ ]]; then
+if [[ $user_command =~ [^0-9a-Z_-]+ ]]; then
 	echo "Invalid symbols used"
 	exit -1
 fi
