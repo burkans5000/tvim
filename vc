@@ -24,7 +24,7 @@ if [ -z "$user_command" ]; then
 	exec $VIM "$@"
 fi
 
-if [[ $date =~ [^0-9a-Z_-]+ ]]; then
+if [[ $user_command =~ [0-9a-Z_-]+ ]]; then
 	echo "Invalid symbols used"
 	exit -1
 fi
@@ -45,7 +45,14 @@ else
 	# Get currently active buffer name
 	bufname=`$VIM --servername $server --remote-expr 'bufname("")' 2> /dev/null`
 	if [ -z "$bufname" ]; then
-		echo "No new buffers open in $VIM. Impossible to focus."
+		# If no buffer -> check that server even exists
+		if $VIM --serverlist | grep "^${server}$"; then
+			# Server exists, do nothing
+			echo "No new buffers open in $VIM. Impossible to focus."
+		else
+			# Server does not exist -> create new server
+			exec $VIM --servername $server
+		fi
 	else
 		$VIM --servername $server --remote-silent "$bufname"
 	fi
